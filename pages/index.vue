@@ -2,9 +2,9 @@
   <section class="container">
     <div>
       <div class="links">
-        <Home v-if="!isLogin" />
+        <Home v-if="!($store.state.isLogin)" />
         <MyPage
-          v-if="isLogin"
+          v-if="$store.state.isLogin"
           :user="userData"
           :charge="charge"
           :use="use" />
@@ -18,8 +18,11 @@ import firebase from '@/plugins/firebase'
 import Home from '~/components/Home.vue';
 import MyPage from '~/components/MyPage.vue';
 import 'vuetify/dist/vuetify.min.css'
+import store from '~/store/index.js'
+import { mapMutations } from 'vuex'
 
 export default {
+  store,
   components: {
     Home,
     MyPage
@@ -39,8 +42,7 @@ export default {
     }
   },
   asyncData (context) {
-    return { name: 'Hello, World！！', isLogin:false,
-             userData:null }
+    return { userData:null }
   },
   fetch () {
     // `fetch` メソッドはページの描画前にストアを満たすために使用される
@@ -49,10 +51,12 @@ export default {
     firebase.auth().onAuthStateChanged(user => {
       console.log(user);
       if (user) {
-        this.isLogin = true;
+        store.commit('isLogin', true);
+        store.commit('userData', user);
         this.userData = user;
       } else {
-        this.isLogin = false;
+        store.commit('isLogin', false);
+        store.commit('userData', null);
         this.userData = null;
       };
     });

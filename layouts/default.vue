@@ -1,9 +1,87 @@
 <template>
-  <div>
-    <nuxt/>
-  </div>
+  <v-app>
+    <v-navigation-drawer
+      :mini-variant.sync="miniVariant"
+      :clipped="clipped"
+      v-model="drawer"
+      fixed
+      app
+    >
+      <v-list>
+        <v-list-tile
+          v-for="(item, i) in items"
+          :to="item.to"
+          :key="i"
+          router
+          exact
+        >
+          <v-list-tile-action>
+            <v-icon v-html="item.icon" />
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title v-text="item.title" />
+          </v-list-tile-content>
+        </v-list-tile>
+        <v-list-tile
+          v-if="$store.state.isLogin"
+          @click="signout">
+          <v-list-tile-action>
+            <v-icon>logout</v-icon>
+          </v-list-tile-action>
+          <v-list-tile-content>
+            <v-list-tile-title>SignOut</v-list-tile-title>
+          </v-list-tile-content>
+        </v-list-tile>
+      </v-list>
+    </v-navigation-drawer>
+    <v-toolbar
+      :clipped-left="clipped"
+      fixed
+      app
+    >
+      <v-toolbar-side-icon @click="drawer = !drawer" />
+      <v-toolbar-title v-text="title" />
+      <v-spacer />
+    </v-toolbar>
+    <v-content>
+      <v-container>
+        <nuxt/>
+      </v-container>
+    </v-content>
+    <v-footer
+      :fixed="fixed"
+      app
+    >
+      <span>&copy; \{{ new Date().getFullYear() }}</span>
+    </v-footer>
+  </v-app>
 </template>
 
+<script>
+import firebase from '@/plugins/firebase'
+import store from '~/store/index.js'
+
+export default {
+  store,
+  data () {
+    return {
+      clipped: false,
+      drawer: true,
+      fixed: false,
+      items: [
+          { icon: 'app', title: 'Welcome', to: '/' }
+      ],
+      miniVariant: false,
+      title: 'Nuxt Firebase'
+    }
+  },
+  methods: {
+    signout: function () {
+      firebase.auth().signOut();
+    }
+  }
+}
+</script>
 <style>
 html {
   font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;

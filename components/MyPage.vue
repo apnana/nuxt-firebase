@@ -1,10 +1,8 @@
 <template>
   <div id="mypage">
-    <span>こんにちは, {{ user.displayName }}さん</span>
+    <span>こんにちは, {{ user.displayName }} さん</span>
     <span>チャージ量 {{ chargeMByte() }}Mbyte</span>
     <span>使用量 {{ useMByte() }}Mbyte</span>
-    <v-btn @click="logout">ログアウト</v-btn>
-    <v-btn @click="pushNotification">Push通知</v-btn>
   </div>
 </template>
 
@@ -96,43 +94,11 @@ export default {
     })
   },
   methods: {
-    logout: function() {
-      firebase.auth().signOut();
-    },
     chargeMByte: function () {
       return this.charge / 1000000
     },
     useMByte: function () {
       return this.use / 1000000
-    },
-    pushNotification: function () {
-      const db = firebase.firestore()
-      const messaging = firebase.messaging()
-      messaging.usePublicVapidKey(process.env.VAPID_KEY)
-      db.collection('users').doc(this.user.email).get().then((doc) => {
-        if (doc.exists) {
-          const token = doc.data().token
-          const arg = {
-            to: token,
-            notification: {
-              body: 'Add data amount',
-              title: 'notification',
-              click_action: process.env.BASE_URL
-            },
-            "data" : {
-                "body" : "Add data amount",
-                "title": "notification"
-            }
-          }
-          const option = {
-            headers: {
-              'Content-Type': 'applicatioin/json',
-              'Authorization': 'key=' + process.env.FCM_SEVER_KEY
-            }
-          }
-          axios.post(process.env.FCM_HTTP_API, arg, option)
-        }
-      })
     }
   }
 }
